@@ -1,0 +1,166 @@
+{
+  "width": 800,
+  "height": 550,
+  "padding": "auto",
+  "data": [
+    {
+      "name": "table",
+      "values": []
+    }
+  ],
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "ordinal",
+      "range": "width",
+      "nice": true,
+      "domain": {
+        "data": "table",
+        "field": "state"
+      }
+    },
+    {
+      "name": "yscale",
+      "range": "height",
+      "nice": true,
+      "domain": {
+        "data": "table",
+        "field": "cancellation_num"
+      }
+    }
+  ],
+  "axes": [
+    {
+      "scale": "xscale",
+      "type": "x"
+    },
+    {
+      "scale": "yscale",
+      "type": "y"
+    }
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "from": {
+        "data": "table"
+      },
+      "properties": {
+        "enter": {
+          "x": {
+            "scale": "xscale",
+            "field": "state",
+            "offset": 0,
+            "mult": 0.0
+          },
+          "width": {
+            "scale": "xscale",
+            "band": true,
+            "offset": -4,
+            "mult": 0.0
+          },
+          "y": {
+            "scale": "yscale",
+            "field": "cancellation_num",
+            "offset": 0,
+            "mult": 0.0
+          },
+          "y2": {
+            "scale": "yscale",
+            "value": 0,
+            "offset": 0,
+            "mult": 0.0
+          }
+        },
+        "update": {
+          "fill": {
+            "value": "steelblue",
+            "offset": 0,
+            "mult": 0.0
+          }
+        },
+        "hover": {
+          "fill": {
+            "value": "Teal",
+            "offset": 0,
+            "mult": 0.0
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "properties": {
+        "enter": {
+          "fill": {
+            "value": "#333",
+            "offset": 0,
+            "mult": 0.0
+          },
+          "align": {
+            "value": "center",
+            "offset": 0,
+            "mult": 0.0
+          }
+        },
+        "update": {
+          "x": {
+            "scale": "xscale",
+            "offset": 0,
+            "mult": 0.0,
+            "signal": "tooltip.state"
+          },
+          "y": {
+            "scale": "yscale",
+            "offset": -5,
+            "mult": 0.0,
+            "signal": "tooltip.cancellation_num"
+          },
+          "dx": {
+            "scale": "xscale",
+            "band": true,
+            "offset": 0,
+            "mult": 0.5
+          },
+          "text": {
+            "signal": "tooltip.cancellation_num"
+          }
+        }
+      }
+    }
+  ],
+  "signals": [
+    {
+      "name": "tooltip",
+      "init": {},
+      "streams": [
+        {
+          "type": "rect:mouseover",
+          "expr": "datum"
+        },
+        {
+          "type": "rect:mouseout",
+          "expr": "{}"
+        },
+        {
+          "type": "rect:dblclick",
+          "expr": "open(\u0027result.jsp?cancel\u003d\u0027+datum.cancellation_num+\u0027\u0026state\u003d\u0027+datum.state)"
+        }
+      ]
+    }
+  ],
+  "predicates": [
+    {
+      "name": "tooltip",
+      "type": "\u003d\u003d",
+      "operands": [
+        {
+          "arg": "id"
+        },
+        {
+          "signal": "tooltip._id"
+        }
+      ]
+    }
+  ]
+}

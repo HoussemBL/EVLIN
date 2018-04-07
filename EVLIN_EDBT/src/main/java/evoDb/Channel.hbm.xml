@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jan 8, 2018 2:36:58 PM by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="Channel" table="channel" schema="public">
+        <id name="idchannel" type="int">
+            <column name="idchannel" />
+            <generator class="assigned" />
+        </id>
+        <many-to-one name="scale" class="Scale" fetch="select">
+            <column name="idscale" />
+        </many-to-one>
+        <property name="field" type="string">
+            <column name="field" length="45" />
+        </property>
+        <property name="channeltype" type="string">
+            <column name="channeltype" length="45" />
+        </property>
+        <set name="channelusages" table="channelusage" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="idchannel" not-null="true" />
+            </key>
+            <one-to-many class="Channelusage" />
+        </set>
+    </class>
+</hibernate-mapping>

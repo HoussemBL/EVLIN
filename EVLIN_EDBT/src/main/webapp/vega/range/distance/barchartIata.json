@@ -1,0 +1,191 @@
+{
+  "name": "boxplot",
+ 
+  "padding": "auto",
+  "signals": [{"name": "boxSize","init": 15}],
+  "axes": [
+    {"type": "x","scale": "x"   ,
+      "title": "Cancellation number"},
+    {
+      "offset": 15,
+      "properties": {"axis": {"stroke": {"value": "transparent"}}},
+      "type": "y",
+      "scale": "y",
+      "tickSize": 0
+         ,
+      "title": "iata of destination"
+    }
+  ],
+  "scales": [
+    {
+      "name": "y",
+      "points": true,
+      "padding": 1.5,
+      "range": "height",
+      "domain": {"data": "table","field": "iata"},
+      "type": "ordinal",
+      "round": true
+   
+    },
+    {
+      "name": "x",
+      "nice": true,
+      "range": "width",
+      "domain": {"data": "table","field": ["nummer"]},
+      "type": "linear",
+      "round": true
+    }
+  ],
+  "data": [
+    {
+      "name": "table",
+      "values": [
+     
+      ]
+    },
+    {
+      "name": "stats",
+      "source": "table",
+      "transform": [
+        {
+          "type": "aggregate",
+          "groupby": ["iata"],
+          "summarize": {
+            "nummer": ["min","max","average","q1","q3","valid"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "stats1",
+      "source": "table",
+      "transform": [
+        {
+          "type": "facet",
+          "groupby": ["iata","distance"],
+          "summarize": {
+            "nummer": ["min","max","average","q1","q3","valid"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "stats2",
+      "source": "table",
+      "transform": [{"type": "filter","test": "datum.distance!='other'"}]
+    },
+     {
+      "name": "stats3",
+      "source": "stats2",
+      "transform": [
+        {
+          "type": "aggregate",
+          "groupby": ["iata"],
+          "summarize": {
+            "nummer": ["average"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "iqrcalcs",
+      "source": "stats",
+      "transform": [
+        {
+          "type": "formula",
+          "field": "lower",
+          "expr": "max(datum.min_nummer,datum.q1_nummer-1.5*(datum.q3_nummer-datum.q1_nummer))"
+        },
+        {
+          "type": "formula",
+          "field": "upper",
+          "expr": "max(datum.max_nummer,datum.q3_nummer+1.5*(datum.q3_nummer-datum.q1_nummer))"
+        }
+      ]
+    },
+    {
+      "name": "iqrcalcs2",
+      "source": "stats2",
+      "transform": [
+        {
+          "type": "formula",
+          "field": "lower",
+          "expr": "max(datum.min_nummer,datum.q1_nummer-1.5*(datum.q3_nummer-datum.q1_nummer))"
+        },
+        {
+          "type": "formula",
+          "field": "upper",
+          "expr": "min(datum.max_nummer,datum.q3_nummer+1.5*(datum.q3_nummer-datum.q1_nummer))"
+        }
+      ]
+    }
+  ],
+  "marks": [
+    {
+      "properties": {
+        "enter": {
+          "height": {"value": 1},
+          "x2": {"field": "upper","scale": "x"},
+          "x": {"field": "lower","scale": "x"},
+          "yc": {"field": "iata","scale": "y"},
+          "fill": {"value": "#888"}
+        }
+      },
+      "from": {"data": "iqrcalcs"},
+      "type": "rect"
+    },
+    {
+      "type": "symbol",
+      "from": {"data": "stats"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x","field": "min_y"},
+          "yc": {"scale": "y","field": "x"},
+          "size": {"value": 20},
+          "stroke": {"value": "#000"},
+          "fill": {"value": "#fff"}
+        }
+      }
+    },
+        {
+      "type": "rect",
+      "from": {"data": "iqrcalcs"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x","field": "lower"},
+          "width": {"value": 2},
+          "yc": {"scale": "y","field": "iata"},
+          "height": {"signal": "boxSize","mult": 0.5},
+          "fill": {"value": "#000"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "iqrcalcs"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x","field": "upper"},
+          "width": {"value": 2},
+          "yc": {"scale": "y","field": "iata"},
+          "height": {"signal": "boxSize","mult": 0.5},
+          "fill": {"value": "#000"}
+        }
+      }
+    }
+    ,
+        {
+      "type": "rect",
+      "from": {"data": "stats3"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x","field": "average_nummer"},
+          "width": {"value": 12},
+          "yc": {"scale": "y","field": "iata"},
+          "height": {"signal": "boxSize"},
+          "fill": {"value": "green"}
+        }
+      }
+    }
+  ]
+}

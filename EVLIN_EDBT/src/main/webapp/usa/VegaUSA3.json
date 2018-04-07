@@ -1,0 +1,127 @@
+{"width": 900,
+  "height": 560,
+"padding": {"top": 65, "left": 0, "right": 0, "bottom": 0},
+
+  "data": [
+  {
+    "name": "states",
+    "url": "usa/us10m.json",
+    "format": {"type": "topojson", "feature": "states"},
+    "transform": [
+      {
+        "type": "geopath", "projection": "albersUsa",
+        "scale": 1200, "translate": [450, 280]
+      }
+    ]
+  },{
+  "name": "traffic",
+  "url": "usa/flights.csv",
+  "format": {"type": "csv", "parse": "auto"},
+  "transform": [
+    {
+      "type": "aggregate", "groupby": ["origin"],
+      "summarize": [{"field": "count", "ops": ["sum"], "as": ["flights"]}]
+    }
+  ]
+},
+  {
+  "name": "airports",
+  "url": "usa/airports.csv",
+  "format": {"type": "csv", "parse": "auto"},
+  "transform": [
+    {
+      "type": "geo", "projection": "albersUsa",
+      "scale": 1200, "translate": [450, 280],
+      "lon": "longitude", "lat": "latitude"
+    },
+    {
+      "type": "lookup", "on": "traffic", "onKey": "origin",
+      "keys": ["iata"], "as": ["traffic"]
+    },
+    {
+      "type": "filter",
+      "test": "datum.traffic != null"
+    },
+    {
+      "type": "geo", "projection": "albersUsa",
+      "lon": "longitude", "lat": "latitude"
+    },
+    {
+      "type": "filter",
+      "test": "datum.layout_x != null && datum.layout_y != null"
+    }
+  ]
+}
+],
+ "scales": [
+  {
+    "name": "size",
+    "type": "linear",
+    "domain": {"data": "traffic", "field": "flights"},
+    "range": [16, 1000]
+  }
+],
+ "signals": [
+  {
+    "name": "hover", "init": null,
+    "streams": [
+      {"type": "symbol:mouseover", "expr": "datum"},
+      {"type": "symbol:mouseout", "expr": "null"}
+    ]
+  },
+  {
+    "name": "title", "init": "U.S. Airports, 2008",
+    "streams": [{
+      "type": "hover", 
+      "expr": "hover ? hover.name + ' (' + hover.iata + ')' : 'U.S. Airports, 2008'"
+    }]
+  }
+],
+ "marks": [
+  {
+    "type": "path",
+    "from": {"data": "states"},
+    "properties": {
+      "enter": {
+        "path": {"field": "layout_path"},
+        "fill": {"value": "#dedede"},
+        "stroke": {"value": "white"}
+      }   ,
+        "update": {
+           "fill": {"value": "#dedede"}
+        },
+        "hover": {"fill": {"value": "red"}}
+      
+    }
+  },{
+  "type": "symbol",
+  "from": {"data": "airports"},
+  "properties": {
+    "enter": {
+      "x": {"field": "layout_x"},
+      "y": {"field": "layout_y"},
+      "size": {"scale": "size", "field": "traffic.flights"},
+      "fill": {"value": "steelblue"},
+      "fillOpacity": {"value": 0.8},
+      "stroke": {"value": "white"},
+      "strokeWidth": {"value": 1.5}
+    }
+  }
+},{
+  "type": "text",
+  "interactive": false,
+  "properties": {
+    "enter": {
+      "x": {"value": 490},
+      "y": {"value": 0},
+      "fill": {"value": "black"},
+      "fontSize": {"value": 20},
+      "align": {"value": "right"}
+    },
+    "update": {
+      "text": {"signal": "title"}
+    }
+  }
+}
+]
+}

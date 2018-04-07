@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC 
+"-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" 
+"http://jakarta.apache.org/struts/dtds/struts-config_1_3.dtd">
+<struts-config>
+
+  <form-beans type="org.apache.struts.action.ActionFormBean">
+    <form-bean name="userForm" type="prov.mybean.userForm" />
+      <form-bean name="AirpoForm" type="prov.mybean.AirpoForm" />
+      <form-bean name="FacetForm" type="prov.mybean.FacetForm" />
+      <form-bean name="QueryInputForm" type="prov.mybean.QueryInputForm" />
+        <form-bean name="DBForm" type="prov.mybean.DBForm" />
+  </form-beans>
+
+ 
+  
+  
+ <action-mappings type="org.apache.struts.action.ActionMapping">
+      <action path="/schema"   type="prov.act.DistinctValues"  scope="request" input="/start.jsp"  >
+      <forward name="success" path ="/start2.jsp" />
+      </action> 
+   
+      <action path="/query" validate="true" input="/start2.jsp" scope="session"
+	     name="FacetForm" type="prov.act.formulationAction" >
+      <forward name="success" path="/display.jsp" redirect="false" />
+      <forward name="echec" path="/fail.jsp" redirect="false" />
+    </action>
+  
+
+      <action path="/query2" validate="true" input="/start2.jsp" scope="session"
+	     name="QueryInputForm" type="prov.act.QueryDecryptionAction" >
+      <forward name="success" path="/FirstDisplay.jsp" redirect="false" />
+      <forward name="echec" path="/start2.jsp" redirect="false" />
+    </action>
+   
+   
+    <action path="/changeDB" validate="true"  scope="session"
+	     name="DBForm" type="prov.act.DistinctValues" >
+      <forward name="success" path="/start2.jsp" redirect="false" />
+    </action>
+   
+   
+      <action path="/ChangeVis" validate="true"  scope="session"   input="/ChangeVisualization.jsp"
+	      type="prov.act.ChangeOfVizAction" >
+      <forward name="success" path="/FirstDisplay.jsp" redirect="false" />   
+    </action>
+   
+
+   <action path="/ChangeVisOfRec" validate="true"  scope="session"   input="/ChangeRecVis.jsp"
+	      type="prov.act.ChangeOfRecVizAction" >
+      <forward name="success" path="/recResult_One.jsp" redirect="false" />
+     
+    </action>
+
+
+   
+     <action path="/recommend"   type="prov.act.Recommendation"  scope="request" input="/result.jsp"  >
+      <forward name="success" path ="/recommendations.jsp" />
+       <forward name="echec" path ="/recommendationsEmpty.jsp" />
+      </action> 
+      
+     
+                <action path="/getRecViaMatrixOneRec"   type="prov.act.RenderOne"  scope="request" input="/RedirectionRec_One.jsp" >
+      <forward name="success" path ="/recResult_One.jsp" />
+      </action> 
+     
+     
+     
+      
+      
+      
+ 
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+       
+   
+    
+   
+ 
+   
+         
+    
+	
+		
+			
+	   
+   
+ </action-mappings>
+ <message-resources parameter="ApplicationResources" null="false" />
+
+</struts-config>
