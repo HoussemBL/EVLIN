@@ -1,0 +1,241 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v3.json",
+  "width": 1000,
+  "height": 500,
+  "padding": {"top": 25, "left": 0, "right": 0, "bottom": 0},
+  "autosize": "none",
+
+  "signals": [
+   { "name": "tx", "update": "width / 3" },
+    { "name": "ty", "update": "height+160" },
+    {
+      "name": "scale",
+      "value": 350,
+      "on": [{
+        "events": {"type": "wheel", "consume": true},
+        "update": "clamp(scale * pow(1.0005, -event.deltaY * pow(16, event.deltaMode)), 350, 2000)"
+      }]
+    },
+    {
+      "name": "angles",
+      "value": [0, 0],
+      "on": [{
+        "events": "mousedown",
+        "update": "[rotateX, centerY]"
+      }]
+    },
+    {
+      "name": "cloned",
+      "value": null,
+      "on": [{
+        "events": "mousedown",
+        "update": "copy('projection')"
+      }]
+    },
+    {
+      "name": "start",
+      "value": null,
+      "on": [{
+        "events": "mousedown",
+        "update": "invert(cloned, xy())"
+      }]
+    },
+    {
+      "name": "drag", "value": null,
+      "on": [{
+        "events": "[mousedown, window:mouseup] > window:mousemove",
+        "update": "invert(cloned, xy())"
+      }]
+    },
+    {
+      "name": "delta", "value": null,
+      "on": [{
+        "events": {"signal": "drag"},
+        "update": "[drag[0] - start[0], start[1] - drag[1]]"
+      }]
+    },
+    {
+      "name": "rotateX", "value": 0,
+      "on": [{
+        "events": {"signal": "delta"},
+        "update": "angles[0] + delta[0]"
+      }]
+    },
+    {
+      "name": "centerY", "value": 0,
+      "on": [{
+        "events": {"signal": "delta"},
+        "update": "clamp(angles[1] + delta[1], -60, 60)"
+      }]
+    },
+    {
+      "name": "hover",
+      "value": null,
+      "on": [
+        {"events": "@cell:mouseover", "update": "datum"},
+        {"events": "@cell:mouseout", "update": "null"}
+      ]
+    },
+    {
+      "name": "title",
+      "value": "European leagues",
+      "update": "hover ? hover.name + ' (' + hover.name + ')' : 'European leagues'"
+    },
+    {
+      "name": "cell_stroke",
+      "value": null,
+      "on": [
+        {"events": "dblclick", "update": "cell_stroke ? null : 'brown'"},
+        {"events": "mousedown!", "update": "cell_stroke"}
+      ]
+    }
+  ],
+
+  "data": [
+    {
+      "name": "states",
+      "url": "maps/europe.json",
+      "format": {"type": "topojson", "feature": "europe"},
+      "transform": [
+        {
+          "type": "geopath",
+          "projection": "projection"
+        }
+      ]
+    },
+    {
+      "name": "traffic",
+      "url": "maps/soccer_leagues.csv",
+      "format": {"type": "csv","parse": "auto"
+      }  ,
+     
+      "transform": [
+        {
+          "type": "aggregate",
+          "groupby": ["id"],
+          "fields": ["id"], "ops": ["sum"], "as": ["flights"]
+        }
+      ]
+    },
+    {
+      "name": "airports",
+      "url": "maps/soccer_leagues.csv",
+      "format": {"type": "csv","parse": "auto"
+      }
+      ,
+      "transform": [
+        {
+          "type": "lookup",
+          "from": "traffic", "key": "id",
+          "fields": ["id"], "as": ["traffic"]
+        },
+        {
+          "type": "filter",
+          "expr": "datum.traffic != null"
+        },
+        {
+          "type": "geopoint",
+          "projection": "projection",
+          "fields": ["longi", "lat"]
+        },
+        {
+          "type": "filter",
+          "expr": "datum.x != null && datum.y != null"
+        },
+        {
+          "type": "voronoi", "x": "x", "y": "y"
+        },
+        {
+          "type": "collect", "sort": {
+            "field": "traffic.flights",
+            "order": "descending"
+          }
+        }
+      ]
+    }
+  ],
+
+  "projections": [
+    {
+       "name": "projection",
+      "type": "mercator",
+      "scale": {"signal": "scale"},
+      "rotate": [{"signal": "rotateX"}, 0, 0],
+       "center": [0, {"signal": "centerY"}],
+      "translate": [{"signal": "tx"}, {"signal": "ty"}]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "size",
+      "type": "linear",
+      "domain": {"data": "traffic", "field": "flights"},
+      "range": [16, 1000]
+    }
+  ],
+
+  "marks": [
+    {
+      "type": "path",
+      "from": {"data": "states"},
+      "encode": {
+        "enter": {
+          "fill": {"value": "#dedede"},
+          "stroke": {"value": "white"}
+        },
+        "update": {
+          "path": {"field": "path"}
+        }
+      }
+    },
+    {
+      "type": "symbol",
+      "from": {"data": "airports"},
+      "encode": {
+        "enter": {
+          "size": {"scale": "size", "field": "traffic.flights"},
+          "fill": {"value": "steelblue"},
+          "fillOpacity": {"value": 1.2},
+          "stroke": {"value": "white"},
+          "strokeWidth": {"value": 0}
+        },
+        "update": {
+          "x": {"field": "x"},
+          "y": {"field": "y"}
+        }
+      }
+    },
+    {
+      "type": "path",
+      "name": "cell",
+      "from": {"data": "airports"},
+      "encode": {
+        "enter": {
+          "fill": {"value": "transparent"},
+          "strokeWidth": {"value": 0.35}
+        },
+        "update": {
+          "path": {"field": "path"},
+          "stroke": {"signal": "cell_stroke"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {"value": 605},
+          "y": {"value": 0},
+          "fill": {"value": "black"},
+          "fontSize": {"value": 20},
+          "align": {"value": "right"}
+        },
+        "update": {
+          "text": {"signal": "title"}
+        }
+      }
+    }
+  ]
+}

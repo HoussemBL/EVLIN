@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jan 8, 2018 2:36:58 PM by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="Querytable" table="querytable" schema="public">
+        <id name="idquery" type="int">
+            <column name="idquery" />
+            <generator class="assigned" />
+        </id>
+        <property name="datasetname" type="string">
+            <column name="datasetname" length="45" />
+        </property>
+        <property name="transformation" type="serializable">
+            <column name="transformation" />
+        </property>
+        <property name="datasetvalue" type="serializable">
+            <column name="datasetvalue" />
+        </property>
+        <property name="literal" type="string">
+            <column name="literal" length="45" />
+        </property>
+        <set name="visualizations" table="visualization" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="idquery" />
+            </key>
+            <one-to-many class="Visualization" />
+        </set>
+    </class>
+</hibernate-mapping>

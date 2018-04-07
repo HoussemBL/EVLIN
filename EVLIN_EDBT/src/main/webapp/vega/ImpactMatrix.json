@@ -1,0 +1,172 @@
+{
+  "width": 400,
+  "height": 250,
+  "data": [
+    {
+      "name": "racine",
+      "values": [
+     
+        {"name": "   ZOOM/IN","group": 3,"index":98},
+         {"name": "   ZOOM/IN_Slice","group": 3,"index":99},
+      
+        {"name": "     DrillDown","group": 1,"index": 110},
+        {"name": "     DrillDown_SLice","group": 1,"index": 111}
+      ]
+    },
+    {
+      "name": "racineY",
+      "values": [
+   {"name": "   ZOOM/IN","group": 3,"index":98},
+         {"name": "   ZOOM/IN_Slice","group": 3,"index":99},
+       
+        {"name": "     DrillDown","group": 1,"index": 110},
+        {"name": "     DrillDown_SLice","group": 1,"index": 111}
+      ]
+    },
+    {
+      "name": "scores",
+      "values": [
+        
+      ]
+    },
+    {
+      "name": "nodes",
+      "source": "racine",
+      "transform": [
+        {
+          "type": "formula",
+          "field": "order",
+          "expr": "datum.order == null ? datum.index : datum.order"
+        }
+      ]
+    },
+    {
+      "name": "edges",
+      "source": "scores",
+      "transform": [
+        {
+          "type": "lookup",
+          "on": "nodes",
+          "onKey": "index",
+          "keys": ["source","target"],
+          "as": ["s","t"]
+        }
+      ]
+    },
+    {
+      "name": "joudhour",
+      "values": [
+       
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "x",
+      "type": "ordinal",
+      "domain": {"data": "racineY","field": "index","sort": true},
+      "range": "width"
+    },
+    {
+      "name": "y",
+      "type": "ordinal",
+      "domain": {"data": "joudhour","field": "index","sort": true},
+      "range": "height"
+    },
+    {
+      "name": "c",
+      "type": "linear",
+      "domain": [0,0.1,0.15,0.2,0.4,0.7,1],
+      "range": ["#feedde",
+"#fdd0a2",
+"#fdae6b",
+"#fd8d3c",
+"#f16913",
+"#d94801",
+"#8c2d04"],
+      "zero": false
+    }
+  ],
+  "legends": [
+    {
+      "title": "Dissimilarity degree",
+      "values": [0,1],
+      "fill": "c",
+      "properties": {
+        "title": {"fontSize": {"value": 14}},
+        "labels": {"fontSize": {"value": 12}},
+        "symbols": {"stroke": {"value": "transparent"}},
+        "legend": {
+         
+          "stroke": {"value": 7.5},
+          "x": {"value": -140},
+          "y": {"value": -61},
+          "fill": {"value": "white"}
+        }
+      }
+    }
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data": "edges"},
+      "properties": {
+        "update": {
+          "x": {"scale": "x","field": "t.order"},
+          "width": {"scale": "x","band": true,"offset": -1},
+          "y": {"scale": "y","field": "s.order"},
+          "height": {"scale": "y","band": true,"offset": -1},
+          "fill": {"scale": "c","field": "value"}
+        }
+      }
+    },
+    {
+      "name": "label",
+      "type": "text",
+      "from": {"data": "racineY"},
+      "properties": {
+        "update": {
+          "x": {"scale": "x","field": "index"},
+          "y": {"value": -10},
+          "dy": {"scale": "x","band": true,"mult": 0.5},
+          "text": {"field": "name"},
+          "fontSize": {"value": 12},
+          "angle": {"value": -90},
+          "align": {"value": "Center"},
+          "fill": [{"value": "steelblue"},{"value": "black"}]
+        }
+      }
+    },
+    {
+      "name": "label",
+      "type": "text",
+      "from": {"data": "joudhour"},
+      "properties": {
+        "update": {
+          "x": {"value": -2},
+          "y": {"scale": "y","field": "index"},
+          "dy": {"scale": "y","band": true,"mult": 0.5},
+          "text": {"field": "name"},
+          "fontSize": {"value": 12},
+          "align": {"value": "right"},
+          "fill": [{"value": "steelblue"},{"value": "black"}]
+        }
+      }
+    }
+  ],
+  "signals": [
+    {
+      "name": "tooltip",
+      "init": {},
+      "streams": [
+        {"type": "rect:mouseover","expr": "datum"},
+        {"type": "rect:mouseout","expr": "{}"},
+        {
+          "type": "rect:dblclick",
+             
+             "expr": "open('RedirectionRec_One.jsp?vis='+datum.s.name+'&type='+datum.t.index,'_self')"
+        }
+      ]
+    }
+  ]
+}

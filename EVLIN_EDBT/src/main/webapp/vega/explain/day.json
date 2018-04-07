@@ -1,0 +1,54 @@
+{
+  "name": "Vega Visualization",
+  "height": 250,
+  "padding": "auto",
+  "data": [
+    {
+      "name": "table",
+      "values": [
+       
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "color",
+      "range": "category20",
+      "domain": {"data": "table","field": "dayofmonth"},
+      "type": "ordinal"
+    },
+    {
+      "name": "size",
+      "type": "linear",
+      "domain": {"data": "table","field": "nummer"},
+      "range": [10,40]
+    }
+  ],
+  "width": 650,
+  "legends": [{"title": "Day cancellation percentage","fill": "color"}],
+  "marks": [
+    {
+      "properties": {
+        "update": {"fillOpacity": {"value": 1}},
+        "hover": {"fillOpacity": {"value": 0.5}},
+      "enter": {
+          "x": {"field": {"group": "width"}, "mult": 0.5},
+          "y": {"field": {"group": "height"}, "mult": 0.5},
+          "startAngle": {"field": "layout_start"},
+          "endAngle": {"field": "layout_end"},
+          "innerRadius": {"value": 50},
+          "outerRadius": {"value": 250},
+          "stroke": {"value": "#fff"},
+          "fill": {"scale": "color","field": "dayofmonth"}
+        }
+      },
+      "from": {
+        "data": "table",
+        "transform": [
+          {"field": "nummer","type": "pie"}
+        ]
+      },
+      "type": "arc"
+    }
+  ]
+}

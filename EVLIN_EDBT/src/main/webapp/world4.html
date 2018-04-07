@@ -1,0 +1,28 @@
+<html>
+<head>
+  <title>Provenance of person entity</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.0-beta.38/vega.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.0-beta.6/vega-lite.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-beta.19/vega-embed.js"></script>
+   <script src="https://vega.github.io/vega-editor/vendor/d3.min.js"></script>
+    <script src="https://vega.github.io/vega-editor/vendor/d3.geo.projection.min.js"></script>
+    <script src="https://vega.github.io/vega-editor/vendor/topojson.js"></script>
+    <script src="https://vega.github.io/vega-editor/vendor/d3.layout.cloud.js"></script>
+    <script src="https://vega.github.io/vega/vega.min.js"></script>
+
+</head>
+<body>
+
+  <div id="vis"></div>
+
+  <script type="text/javascript">
+    var y12 ="/maps/formulaOneDynamic.json" 
+
+    vega.embed("#vis", y12)
+    .hover().addEventListener('click', function(event, item) {
+      open('https://watson.analytics.ibmcloud.com/product','_self')
+ // console.log('dblclick', event, item);
+});;
+  </script>
+</body>
+</html>
